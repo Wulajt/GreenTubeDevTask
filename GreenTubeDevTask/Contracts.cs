@@ -12,6 +12,6 @@ namespace GreenTubeDevTask.Contracts
     public record WalletContract(Guid Id, decimal Balance, DateTime DateCreated);
 
     // Transaction Contracts
-    public record TransactionContract(Guid Id, Guid PlayerId, TransactionType Type, decimal Amount, DateTime DateCreated);
-    public record RegisterTransactionContract([Required] Guid PlayerId, [Required] TransactionType Type, [Required] decimal Amount);
+    public record TransactionContract(Guid Id, Guid PlayerId, TransactionType Type, decimal Amount, DateTime DateCreated, TransactionStatus Status);
+    public record RegisterTransactionContract([Required] Guid PlayerId, [Required] TransactionType Type, [Required] decimal Amount, [Required] Guid IdempotentKey);
 }

@@ -17,7 +17,7 @@ namespace GreenTubeDevTask
 
         public static TransactionContract AsContract(this Transaction transaction)
         {
-            return new TransactionContract(transaction.Id, transaction.PlayerId, transaction.Type, transaction.Amount, transaction.DateCreated);
+            return new TransactionContract(transaction.Id, transaction.PlayerId, transaction.Type, transaction.Amount, transaction.DateCreated, transaction.Status);
         }
     }
 }

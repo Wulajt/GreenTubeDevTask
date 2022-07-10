@@ -11,5 +11,12 @@ namespace GreenTubeDevTask.InMemRepositories
         {
             return GetAll().Where(transaction => transaction.PlayerId == playerId);
         }
+
+        Transaction ITransactionRepository.GetTransactionByPlayerIdAndIdempotentKey(Guid playerId, Guid idempotentKey)
+        {
+            return GetAll()
+                .Where(transaction => (transaction.PlayerId == playerId && transaction.IdempotentKey == idempotentKey))
+                .FirstOrDefault();
+        }
     }
 }

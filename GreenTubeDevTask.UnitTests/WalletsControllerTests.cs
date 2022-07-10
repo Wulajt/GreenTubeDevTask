@@ -13,6 +13,7 @@ namespace GreenTubeDevTask.UnitTests
 {
     public class WalletsControllerTests
     {
+        private readonly Mock<ITransactionService> _transactionServiceStub = new();
         private readonly Mock<IWalletService> _walletServiceStub = new();
         private readonly Mock<ILogger<WalletsController>> _loggerStub = new();
 
@@ -23,7 +24,7 @@ namespace GreenTubeDevTask.UnitTests
             var expectedWallets = new[] { CreateRandomWallet(), CreateRandomWallet(), CreateRandomWallet() };
             _walletServiceStub.Setup(exp => exp.GetWallets())
                 .Returns(expectedWallets);
-            var controller = new WalletsController(_loggerStub.Object, _walletServiceStub.Object);
+            var controller = new WalletsController(_loggerStub.Object, _walletServiceStub.Object, _transactionServiceStub.Object);
 
             // Act
             var result = controller.GetWallets();
@@ -39,7 +40,7 @@ namespace GreenTubeDevTask.UnitTests
             var expectedWallet = CreateRandomWallet();
             _walletServiceStub.Setup(exp => exp.GetWallet(It.IsAny<Guid>()))
                 .Returns(expectedWallet);
-            var controller = new WalletsController(_loggerStub.Object, _walletServiceStub.Object);
+            var controller = new WalletsController(_loggerStub.Object, _walletServiceStub.Object, _transactionServiceStub.Object);
 
             // Act
             var result = controller.GetWallet(Guid.NewGuid());
@@ -54,7 +55,7 @@ namespace GreenTubeDevTask.UnitTests
             // Arrange
             _walletServiceStub.Setup(exp => exp.GetWallet(It.IsAny<Guid>()))
                 .Returns((Wallet)null);
-            var controller = new WalletsController(_loggerStub.Object, _walletServiceStub.Object);
+            var controller = new WalletsController(_loggerStub.Object, _walletServiceStub.Object, _transactionServiceStub.Object);
 
             // Act
             var result = controller.GetWallet(Guid.NewGuid());

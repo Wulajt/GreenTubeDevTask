@@ -37,27 +37,34 @@ namespace GreenTubeDevTask.Services
 #nullable enable
         public Transaction? RegisterTransaction(RegisterTransactionContract contract)
         {
-            Wallet? playerWallet;
+            var transactionExists = _repository.GetTransactionByPlayerIdAndIdempotentKey(contract.PlayerId, contract.IdempotentKey);
+            if (transactionExists is not null) return transactionExists;
+
+            bool? updateResult;
             switch (contract.Type)
             {
                 case TransactionType.Win:
-                    playerWallet = _walletService.IncreaseWalletBalance(contract.PlayerId, contract.Amount);
+                    updateResult = _walletService.IncreaseWalletBalance(contract.PlayerId, contract.Amount);
                     break;
 
                 case TransactionType.Deposit:
-                    playerWallet = _walletService.IncreaseWalletBalance(contract.PlayerId, contract.Amount);
+                    updateResult = _walletService.IncreaseWalletBalance(contract.PlayerId, contract.Amount);
                     break;
 
                 case TransactionType.Stake:
-                    playerWallet = _walletService.DecreaseWalletBalance(contract.PlayerId, contract.Amount);
+                    updateResult = _walletService.DecreaseWalletBalance(contract.PlayerId, contract.Amount);
                     break;
 
                 default:
                     return null;
             }
-            if (playerWallet is null) return null;
+            if (updateResult is null) return null;
 
             var newTransaction = GenerateTransaction(contract);
+            if ((bool)updateResult)
+                newTransaction.Status = TransactionStatus.Accepted;
+            else
+                newTransaction.Status = TransactionStatus.Rejected;
             _repository.Add(newTransaction);
             return newTransaction;
         }
@@ -70,9 +77,12 @@ namespace GreenTubeDevTask.Services
                 PlayerId = contract.PlayerId,
                 Type = contract.Type,
                 Amount = contract.Amount,
-                DateCreated = DateTime.Now
+                DateCreated = DateTime.Now,
+                IdempotentKey = contract.IdempotentKey,
+                Status = TransactionStatus.Default
             };
         }
+
         //public Transaction CreateTransaction(TransactionType type, decimal amount, Guid walletId)
         //{
         //    _logger.LogInformation("Creating Transaction, WalletId: {0}, Type: {1}, Amount: {2}.", walletId, type, amount);

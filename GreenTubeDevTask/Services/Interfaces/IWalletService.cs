@@ -10,7 +10,7 @@ namespace GreenTubeDevTask.Services
         Wallet GetWallet(Guid id);
         Wallet CreateWallet(Guid playerId);
 #nullable enable
-        Wallet? IncreaseWalletBalance(Guid id, decimal amount);
-        Wallet? DecreaseWalletBalance(Guid id, decimal amount);
+        bool? IncreaseWalletBalance(Guid id, decimal amount);
+        bool? DecreaseWalletBalance(Guid id, decimal amount);
     }
 }

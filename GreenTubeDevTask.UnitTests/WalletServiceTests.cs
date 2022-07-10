@@ -33,7 +33,7 @@ namespace GreenTubeDevTask.UnitTests
         }
 
         [Fact]
-        public void IncreaseWalletBalance_WithAmountToIncrease_ReturnsUpdatedWallet()
+        public void IncreaseWalletBalance_WithAmountToIncrease_ReturnsTrue()
         {
             // Arrange
             var playerWallet = CreateRandomWallet();
@@ -47,14 +47,13 @@ namespace GreenTubeDevTask.UnitTests
             var result = service.IncreaseWalletBalance(Guid.NewGuid(), amountToIncrease);
             
             // Assert
-            result.Should().BeEquivalentTo(
-                playerWallet,
-                options => options.Excluding(x => x.Balance));
-            result.Balance.Should().Be(expectedBalance);
+            result.Should().Be(true);
+            var updatedWallet = service.GetWallet(playerWallet.Id);
+            updatedWallet.Balance.Should().Be(expectedBalance);
         }
 
         [Fact]
-        public void IncreaseWalletBalance_WithNonExistingWallet_ReturnsUpdatedWallet()
+        public void IncreaseWalletBalance_WithNonExistingWallet_ReturnsNull()
         {
             // Arrange
             decimal amountToIncrease = _rand.Next(1, 1000);
@@ -70,7 +69,7 @@ namespace GreenTubeDevTask.UnitTests
         }
 
         [Fact]
-        public void DecreaseWalletBalance_WithAmountToDecrease_ReturnsUpdatedWallet()
+        public void DecreaseWalletBalance_WithAmountToDecrease_ReturnsTrue()
         {
             // Arrange
             var playerWallet = CreateRandomWallet(_rand.Next(1001, 10000));
@@ -84,14 +83,13 @@ namespace GreenTubeDevTask.UnitTests
             var result = service.DecreaseWalletBalance(Guid.NewGuid(), amountToDecrease);
 
             // Assert
-            result.Should().BeEquivalentTo(
-                playerWallet,
-                options => options.Excluding(x => x.Balance));
-            result.Balance.Should().Be(expectedBalance);
+            result.Should().Be(true);
+            var updatedWallet = service.GetWallet(playerWallet.Id);
+            updatedWallet.Balance.Should().Be(expectedBalance);
         }
 
         [Fact]
-        public void DecreaseWalletBalance_WithAmountToDecreaseGreaterThenBalance_ReturnsNull()
+        public void DecreaseWalletBalance_WithAmountToDecreaseGreaterThenBalance_ReturnsFalse()
         {
             // Arrange
             var playerWallet = CreateRandomWallet(_rand.Next(1, 1));
@@ -105,8 +103,9 @@ namespace GreenTubeDevTask.UnitTests
             var result = service.DecreaseWalletBalance(Guid.NewGuid(), amountToDecrease);
 
             // Assert
-            result.Should().Be(null);
-            playerWallet.Balance.Should().Be(expectedBalance);
+            result.Should().Be(false);
+            var updatedWallet = service.GetWallet(playerWallet.Id);
+            updatedWallet.Balance.Should().Be(expectedBalance);
         }
 
         [Fact]

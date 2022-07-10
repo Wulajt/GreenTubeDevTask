@@ -36,20 +36,21 @@ namespace GreenTubeDevTask.Services
             return newWallet;
         }
 #nullable enable
-        public Wallet? IncreaseWalletBalance(Guid id, decimal amount)
+        public bool? IncreaseWalletBalance(Guid id, decimal amount)
         {
             var wallet = GetWallet(id);
             if (wallet is null) return null;
             wallet.Balance = decimal.Add(wallet.Balance, amount);
-            return wallet;
+            return true;
         }
 
-        public Wallet? DecreaseWalletBalance(Guid id, decimal amount)
+        public bool? DecreaseWalletBalance(Guid id, decimal amount)
         {
             var wallet = GetWallet(id);
-            if (wallet is null || wallet.Balance < amount) return null;
+            if (wallet is null) return null;
+            if (wallet.Balance < amount) return false;
             wallet.Balance = decimal.Subtract(wallet.Balance, amount);
-            return wallet;
+            return true;
         }
 #nullable disable
 
