@@ -2,14 +2,13 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace GreenTubeDevTask.InMemRepositories
 {
-    public abstract class BaseRepository<T> where T : IEntity
+    public abstract class RepositoryBase<T> : IRepositoryBase<T> where T : IEntity
     {
-        private readonly List<T> _repository = new();
-        public IEnumerable<T> Get()
+        protected readonly List<T> _repository = new();
+        public IEnumerable<T> GetAll()
         {
             return _repository;
         }

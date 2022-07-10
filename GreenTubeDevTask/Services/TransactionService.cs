@@ -10,20 +10,21 @@ using System.Threading.Tasks;
 
 namespace GreenTubeDevTask.Services
 {
-    public class TransactionService
+    public class TransactionService : ITransactionService
     {
         private readonly ILogger<TransactionService> _logger;
-        private readonly TransactionRepository _repository = new();
+        private readonly ITransactionRepository _repository;
         private readonly IWalletService _walletService;
-        public TransactionService(ILogger<TransactionService> logger, IWalletService walletService)
+        public TransactionService(ILogger<TransactionService> logger, IWalletService walletService, ITransactionRepository transactionRepository)
         {
             _logger = logger;
             _walletService = walletService;
+            _repository = transactionRepository;
         }
 
         public IEnumerable<Transaction> GetTransactions()
         {
-            return _repository.Get();
+            return _repository.GetAll();
         }
         public IEnumerable<Transaction> GetTransactionsByPlayerId(Guid playerId)
         {
@@ -32,6 +33,45 @@ namespace GreenTubeDevTask.Services
         public Transaction GetTransaction(Guid id)
         {
             return _repository.GetById(id);
+        }
+#nullable enable
+        public Transaction? RegisterTransaction(RegisterTransactionContract contract)
+        {
+            Wallet? playerWallet;
+            switch (contract.Type)
+            {
+                case TransactionType.Win:
+                    playerWallet = _walletService.IncreaseWalletBalance(contract.PlayerId, contract.Amount);
+                    break;
+
+                case TransactionType.Deposit:
+                    playerWallet = _walletService.IncreaseWalletBalance(contract.PlayerId, contract.Amount);
+                    break;
+
+                case TransactionType.Stake:
+                    playerWallet = _walletService.DecreaseWalletBalance(contract.PlayerId, contract.Amount);
+                    break;
+
+                default:
+                    return null;
+            }
+            if (playerWallet is null) return null;
+
+            var newTransaction = GenerateTransaction(contract);
+            _repository.Add(newTransaction);
+            return newTransaction;
+        }
+#nullable disable
+        private Transaction GenerateTransaction(RegisterTransactionContract contract)
+        {
+            return new()
+            {
+                Id = Guid.NewGuid(),
+                PlayerId = contract.PlayerId,
+                Type = contract.Type,
+                Amount = contract.Amount,
+                DateCreated = DateTime.Now
+            };
         }
         //public Transaction CreateTransaction(TransactionType type, decimal amount, Guid walletId)
         //{

@@ -1,31 +1,28 @@
 ﻿using GreenTubeDevTask.Entities;
 using GreenTubeDevTask.InMemRepositories;
-using System.Collections.Generic;
-using System;
-using GreenTubeDevTask.Controllers;
 using Microsoft.Extensions.Logging;
-using System.Numerics;
+using System;
+using System.Collections.Generic;
 
 namespace GreenTubeDevTask.Services
 {
     public class WalletService : IWalletService
     {
-        private readonly ILogger<WalletService> _logger;
-        private readonly WalletRepository _repository = new();
-        public WalletService(ILogger<WalletService> logger)
+        //Public
+        public WalletService(ILogger<WalletService> logger, IWalletRepository walletRepository)
         {
             _logger = logger;
+            _repository = walletRepository;
         }
-
         public IEnumerable<Wallet> GetWallets()
         {
-            return _repository.Get();
+            return _repository.GetAll();
         }
         public Wallet GetWallet(Guid id)
         {
             return _repository.GetById(id);
         }
-        Wallet IWalletService.CreateWallet(Guid playerId)
+        public Wallet CreateWallet(Guid playerId)
         {
             _logger.LogInformation("Creating Wallet for PlayerId: {0}.", playerId);
             Wallet newWallet = new()
@@ -38,5 +35,26 @@ namespace GreenTubeDevTask.Services
             _logger.LogInformation("Created Wallet: {0}.", newWallet);
             return newWallet;
         }
+#nullable enable
+        public Wallet? IncreaseWalletBalance(Guid id, decimal amount)
+        {
+            var wallet = GetWallet(id);
+            if (wallet is null) return null;
+            wallet.Balance = decimal.Add(wallet.Balance, amount);
+            return wallet;
+        }
+
+        public Wallet? DecreaseWalletBalance(Guid id, decimal amount)
+        {
+            var wallet = GetWallet(id);
+            if (wallet is null || wallet.Balance < amount) return null;
+            wallet.Balance = decimal.Subtract(wallet.Balance, amount);
+            return wallet;
+        }
+#nullable disable
+
+        // Private, Internal, Protected
+        private readonly ILogger<WalletService> _logger;
+        private readonly IWalletRepository _repository;
     }
 }

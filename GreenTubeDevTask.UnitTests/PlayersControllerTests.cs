@@ -1,29 +1,21 @@
 using FluentAssertions;
-using GreenTubeDevTask.Controllers;
 using GreenTubeDevTask.Contracts;
+using GreenTubeDevTask.Controllers;
 using GreenTubeDevTask.Entities;
 using GreenTubeDevTask.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
 using System;
-using System.Linq;
 using Xunit;
-using Microsoft.AspNetCore.Mvc.Infrastructure;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc.Controllers;
-using Microsoft.Extensions.Options;
-using Microsoft.AspNetCore.Routing;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
+using static GreenTubeDevTask.UnitTests.Helpers;
 
 namespace GreenTubeDevTask.UnitTests
 {
     public class PlayersControllerTests
     {
-        private readonly Mock<IWalletService> _walletServiceStub = new();
         private readonly Mock<IPlayerService> _playerServiceStub = new();
         private readonly Mock<ILogger<PlayersController>> _loggerStub = new();
-        private readonly Random _rand = new();
 
         [Fact]
         public void GetPlayers_WithExistingPlayers_ReturnsAllPlayers()
@@ -48,7 +40,7 @@ namespace GreenTubeDevTask.UnitTests
             _playerServiceStub.Setup(exp => exp.GetPlayer(It.IsAny<Guid>()))
                 .Returns((Player)null);
             var controller = new PlayersController(_loggerStub.Object, _playerServiceStub.Object);
-            
+
             // Act
             var result = controller.GetPlayer(Guid.NewGuid());
 
@@ -110,26 +102,6 @@ namespace GreenTubeDevTask.UnitTests
             registeredPlayer.Should().BeEquivalentTo(expectedPlayer);
             registeredPlayer.Id.Should().NotBeEmpty();
             registeredPlayer.DateCreated.Should().BeCloseTo(DateTime.Now, TimeSpan.FromSeconds(1));
-        }
-
-        private Player CreateRandomPlayer()
-        {
-            return new()
-            {
-                Id = Guid.NewGuid(),
-                Username = Guid.NewGuid().ToString(),
-                DateCreated = DateTime.Now,
-            };
-        }
-
-        private Wallet CreateRandomWallet()
-        {
-            return new()
-            {
-                Id = Guid.NewGuid(),
-                Balance = _rand.Next(1, 1000),
-                DateCreated = DateTime.Now
-            };
         }
     }
 }

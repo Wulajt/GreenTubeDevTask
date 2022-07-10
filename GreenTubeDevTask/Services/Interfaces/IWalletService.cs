@@ -8,6 +8,9 @@ namespace GreenTubeDevTask.Services
     {
         IEnumerable<Wallet> GetWallets();
         Wallet GetWallet(Guid id);
-        internal Wallet CreateWallet(Guid playerId);
+        Wallet CreateWallet(Guid playerId);
+#nullable enable
+        Wallet? IncreaseWalletBalance(Guid id, decimal amount);
+        Wallet? DecreaseWalletBalance(Guid id, decimal amount);
     }
 }
