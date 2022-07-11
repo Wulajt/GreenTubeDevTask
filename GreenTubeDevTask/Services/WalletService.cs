@@ -3,6 +3,7 @@ using GreenTubeDevTask.InMemRepositories;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace GreenTubeDevTask.Services
 {
@@ -14,15 +15,15 @@ namespace GreenTubeDevTask.Services
             _logger = logger;
             _repository = walletRepository;
         }
-        public IEnumerable<Wallet> GetWallets()
+        public async Task<IEnumerable<Wallet>> GetWalletsAsync()
         {
-            return _repository.GetAll();
+            return await _repository.GetAllAsync();
         }
-        public Wallet GetWallet(Guid id)
+        public async Task<Wallet> GetWalletAsync(Guid id)
         {
-            return _repository.GetById(id);
+            return await _repository.GetByIdAsync(id);
         }
-        public Wallet CreateWallet(Guid playerId)
+        public async Task<Wallet> CreateWalletAsync(Guid playerId)
         {
             _logger.LogInformation("Creating Wallet for PlayerId: {0}.", playerId);
             Wallet newWallet = new()
@@ -31,22 +32,22 @@ namespace GreenTubeDevTask.Services
                 Balance = 0,
                 DateCreated = DateTime.Now
             };
-            _repository.Add(newWallet);
+            await _repository.AddAsync(newWallet);
             _logger.LogInformation("Created Wallet: {0}.", newWallet);
-            return newWallet;
+            return await Task.FromResult(newWallet);
         }
 #nullable enable
-        public bool? IncreaseWalletBalance(Guid id, decimal amount)
+        public async Task<bool?> IncreaseWalletBalanceAsync(Guid id, decimal amount)
         {
-            var wallet = GetWallet(id);
+            var wallet = await GetWalletAsync(id);
             if (wallet is null) return null;
             wallet.Balance = decimal.Add(wallet.Balance, amount);
             return true;
         }
 
-        public bool? DecreaseWalletBalance(Guid id, decimal amount)
+        public async Task<bool?> DecreaseWalletBalanceAsync(Guid id, decimal amount)
         {
-            var wallet = GetWallet(id);
+            var wallet = await GetWalletAsync(id);
             if (wallet is null) return null;
             if (wallet.Balance < amount) return false;
             wallet.Balance = decimal.Subtract(wallet.Balance, amount);

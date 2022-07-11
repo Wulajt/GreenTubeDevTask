@@ -6,6 +6,7 @@ using GreenTubeDevTask.Services;
 using Microsoft.Extensions.Logging;
 using Moq;
 using System;
+using System.Threading.Tasks;
 using Xunit;
 using static GreenTubeDevTask.UnitTests.Helpers;
 
@@ -18,19 +19,19 @@ namespace GreenTubeDevTask.UnitTests
         private readonly Mock<ILogger<PlayerService>> _loggerStub = new();
 
         [Fact]
-        public void CreatePlayer_WithPlayerToCreate_ReturnsCreatedPlayer()
+        public async Task CreatePlayerAsync_WithPlayerToCreate_ReturnsCreatedPlayer()
         {
             // Arrange
             var playerToRegister = new PlayerRegisterContract(Guid.NewGuid().ToString());
 
-            _playerRepositoryStub.Setup(exp => exp.GetByUsername(It.IsAny<string>()))
-                .Returns((Player)null);
-            _walletServiceStub.Setup(exp => exp.CreateWallet(It.IsAny<Guid>()))
-                .Returns((Wallet)null);
+            _playerRepositoryStub.Setup(exp => exp.GetByUsernameAsync(It.IsAny<string>()))
+                .ReturnsAsync((Player)null);
+            _walletServiceStub.Setup(exp => exp.CreateWalletAsync(It.IsAny<Guid>()))
+                .ReturnsAsync((Wallet)null);
             var service = new PlayerService(_loggerStub.Object, _walletServiceStub.Object, _playerRepositoryStub.Object);
 
             // Act
-            var result = service.CreatePlayer(playerToRegister);
+            var result = await service.CreatePlayerAsync(playerToRegister);
 
             // Assert
             result.Should().BeEquivalentTo(playerToRegister);
@@ -39,19 +40,19 @@ namespace GreenTubeDevTask.UnitTests
         }
 
         [Fact]
-        public void CreatePlayer_WithExistingPlayerToCreate_ReturnsNull()
+        public async Task CreatePlayerAsync_WithExistingPlayerToCreate_ReturnsNull()
         {
             // Arrange
             var registeredPlayer = CreateRandomPlayer();
             var playerToRegister = new PlayerRegisterContract(Guid.NewGuid().ToString());
-            _playerRepositoryStub.Setup(exp => exp.GetByUsername(It.IsAny<string>()))
-                .Returns(registeredPlayer);
-            _walletServiceStub.Setup(exp => exp.CreateWallet(It.IsAny<Guid>()))
-                .Returns((Wallet)null);
+            _playerRepositoryStub.Setup(exp => exp.GetByUsernameAsync(It.IsAny<string>()))
+                .ReturnsAsync(registeredPlayer);
+            _walletServiceStub.Setup(exp => exp.CreateWalletAsync(It.IsAny<Guid>()))
+                .ReturnsAsync((Wallet)null);
             var service = new PlayerService(_loggerStub.Object, _walletServiceStub.Object, _playerRepositoryStub.Object);
 
             // Act
-            var result = service.CreatePlayer(playerToRegister);
+            var result = await service.CreatePlayerAsync(playerToRegister);
 
             // Assert
             result.Should().Be(null);

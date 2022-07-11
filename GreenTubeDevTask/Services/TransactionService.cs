@@ -22,37 +22,37 @@ namespace GreenTubeDevTask.Services
             _repository = transactionRepository;
         }
 
-        public IEnumerable<Transaction> GetTransactions()
+        public async Task<IEnumerable<Transaction>> GetTransactionsAsync()
         {
-            return _repository.GetAll();
+            return await _repository.GetAllAsync();
         }
-        public IEnumerable<Transaction> GetTransactionsByPlayerId(Guid playerId)
+        public async Task<IEnumerable<Transaction>> GetTransactionsByPlayerIdAsync(Guid playerId)
         {
-            return _repository.GetAllByPlayerId(playerId);
+            return await _repository.GetAllByPlayerIdAsync(playerId);
         }
-        public Transaction GetTransaction(Guid id)
+        public async Task<Transaction> GetTransactionAsync(Guid id)
         {
-            return _repository.GetById(id);
+            return await _repository.GetByIdAsync(id);
         }
 #nullable enable
-        public Transaction? RegisterTransaction(RegisterTransactionContract contract)
+        public async Task<Transaction?> RegisterTransactionAsync(RegisterTransactionContract contract)
         {
-            var transactionExists = _repository.GetTransactionByPlayerIdAndIdempotentKey(contract.PlayerId, contract.IdempotentKey);
+            var transactionExists = await _repository.GetTransactionByPlayerIdAndIdempotentKeyAsync(contract.PlayerId, contract.IdempotentKey);
             if (transactionExists is not null) return transactionExists;
 
             bool? updateResult;
             switch (contract.Type)
             {
                 case TransactionType.Win:
-                    updateResult = _walletService.IncreaseWalletBalance(contract.PlayerId, contract.Amount);
+                    updateResult = await _walletService.IncreaseWalletBalanceAsync(contract.PlayerId, contract.Amount);
                     break;
 
                 case TransactionType.Deposit:
-                    updateResult = _walletService.IncreaseWalletBalance(contract.PlayerId, contract.Amount);
+                    updateResult = await _walletService.IncreaseWalletBalanceAsync(contract.PlayerId, contract.Amount);
                     break;
 
                 case TransactionType.Stake:
-                    updateResult = _walletService.DecreaseWalletBalance(contract.PlayerId, contract.Amount);
+                    updateResult = await _walletService.DecreaseWalletBalanceAsync(contract.PlayerId, contract.Amount);
                     break;
 
                 default:
@@ -65,8 +65,8 @@ namespace GreenTubeDevTask.Services
                 newTransaction.Status = TransactionStatus.Accepted;
             else
                 newTransaction.Status = TransactionStatus.Rejected;
-            _repository.Add(newTransaction);
-            return newTransaction;
+            await _repository.AddAsync(newTransaction);
+            return await Task.FromResult(newTransaction);
         }
 #nullable disable
         private Transaction GenerateTransaction(RegisterTransactionContract contract)

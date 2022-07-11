@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace GreenTubeDevTask.Controllers
 {
@@ -21,26 +22,26 @@ namespace GreenTubeDevTask.Controllers
         }
 
         [HttpGet]
-        public IEnumerable<PlayerContract> GetPlayers()
+        public async Task<IEnumerable<PlayerContract>> GetPlayersAsync()
         {
-            var players = _playerService.GetPlayers().Select(item => item.AsContract());
+            var players = (await _playerService.GetPlayersAync()).Select(item => item.AsContract());
             return players;
         }
 
         [HttpGet("{id}")]
-        public ActionResult<PlayerContract> GetPlayer(Guid id)
+        public async Task<ActionResult<PlayerContract>> GetPlayerAsync(Guid id)
         {
-            var player = _playerService.GetPlayer(id);
+            var player = await _playerService.GetPlayerAsync(id);
             if (player is null) return NotFound();
             return player.AsContract();
         }
 
         [HttpPost("register")]
-        public ActionResult<PlayerContract> RegisterPlayer(PlayerRegisterContract playerContract)
+        public async Task<ActionResult<PlayerContract>> RegisterPlayerAsync(PlayerRegisterContract playerContract)
         {
-            var newPlayer = _playerService.CreatePlayer(playerContract);
+            var newPlayer = await _playerService.CreatePlayerAsync(playerContract);
             if (newPlayer is null) return ValidationProblem(detail: "Username already registered.");
-            return CreatedAtAction(nameof(GetPlayer), new { id = newPlayer.Id }, newPlayer.AsContract());
+            return CreatedAtAction(nameof(GetPlayerAsync), new { id = newPlayer.Id }, newPlayer.AsContract());
         }
     }
 }

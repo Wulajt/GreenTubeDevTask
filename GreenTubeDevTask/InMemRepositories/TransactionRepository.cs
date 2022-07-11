@@ -2,19 +2,20 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace GreenTubeDevTask.InMemRepositories
 {
     public class TransactionRepository : RepositoryBase<Transaction>, ITransactionRepository, IRepositoryBase<Transaction>
     {
-        public IEnumerable<Transaction> GetAllByPlayerId(Guid playerId)
+        public async Task<IEnumerable<Transaction>> GetAllByPlayerIdAsync(Guid playerId)
         {
-            return GetAll().Where(transaction => transaction.PlayerId == playerId);
+            return (await GetAllAsync()).Where(transaction => transaction.PlayerId == playerId);
         }
 
-        Transaction ITransactionRepository.GetTransactionByPlayerIdAndIdempotentKey(Guid playerId, Guid idempotentKey)
+        async Task<Transaction> ITransactionRepository.GetTransactionByPlayerIdAndIdempotentKeyAsync(Guid playerId, Guid idempotentKey)
         {
-            return GetAll()
+            return (await GetAllAsync())
                 .Where(transaction => (transaction.PlayerId == playerId && transaction.IdempotentKey == idempotentKey))
                 .FirstOrDefault();
         }

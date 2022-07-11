@@ -4,6 +4,7 @@ using GreenTubeDevTask.InMemRepositories;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace GreenTubeDevTask.Services
 {
@@ -17,30 +18,30 @@ namespace GreenTubeDevTask.Services
             _walletService = walletService;
             _repository = playerRepository;
         }
-        public IEnumerable<Player> GetPlayers()
+        public async Task<IEnumerable<Player>> GetPlayersAync()
         {
-            return _repository.GetAll();
+            return await _repository.GetAllAsync();
         }
-        public Player GetPlayer(Guid id)
+        public async Task<Player> GetPlayerAsync(Guid id)
         {
-            return _repository.GetById(id);
+            return await _repository.GetByIdAsync(id);
         }
-        public Wallet GetPlayerWallet(Guid id)
+        public async Task<Wallet> GetPlayerWallet(Guid id)
         {
-            return _walletService.GetWallet(id);
+            return await _walletService.GetWalletAsync(id);
         }
 #nullable enable
-        public Player? CreatePlayer(PlayerRegisterContract player)
+        public async Task<Player?> CreatePlayerAsync(PlayerRegisterContract player)
         {
             _logger.LogInformation("Creating Player with Username: {0}.", player.Username);
-            if (_repository.GetByUsername(player.Username) is not null)
+            if (await _repository.GetByUsernameAsync(player.Username) is not null)
             {
                 _logger.LogInformation("Failed to create Player, username exists. Username: {0}", player.Username);
                 return null;
             }
 
             Guid newPlayerId = Guid.NewGuid();
-            _ = _walletService.CreateWallet(newPlayerId);
+            _ = _walletService.CreateWalletAsync(newPlayerId);
 
             Player newPlayer = new()
             {
@@ -48,9 +49,9 @@ namespace GreenTubeDevTask.Services
                 Username = player.Username,
                 DateCreated = DateTime.Now
             };
-            _repository.Add(newPlayer);
+            await _repository.AddAsync(newPlayer);
             _logger.LogInformation("Created Player: {0}.", newPlayer);
-            return newPlayer;
+            return await Task.FromResult(newPlayer);
         }
 #nullable disable
 
@@ -58,9 +59,9 @@ namespace GreenTubeDevTask.Services
         private readonly ILogger<PlayerService> _logger;
         private readonly IPlayerRepository _repository;
         private readonly IWalletService _walletService;
-        Player IPlayerService.GetPlayerByUsername(string username)
+        async Task<Player> IPlayerService.GetPlayerByUsernameAsync(string username)
         {
-            return _repository.GetByUsername(username);
+            return await _repository.GetByUsernameAsync(username);
         }
     }
 }

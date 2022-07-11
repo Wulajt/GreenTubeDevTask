@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace GreenTubeDevTask.Controllers
 {
@@ -24,23 +25,23 @@ namespace GreenTubeDevTask.Controllers
         }
 
         [HttpGet]
-        public IEnumerable<WalletContract> GetWallets()
+        public async Task<IEnumerable<WalletContract>> GetWalletsAsync()
         {
-            var wallets = _walletService.GetWallets().Select(wallet => wallet.AsContract());
+            var wallets = (await _walletService.GetWalletsAsync()).Select(wallet => wallet.AsContract());
             return wallets;
         }
 
         [HttpGet("{id}")]
-        public ActionResult<WalletContract> GetWallet(Guid id)
+        public async Task<ActionResult<WalletContract>> GetWalletAsync(Guid id)
         {
-            var wallet = _walletService.GetWallet(id);
+            var wallet = await _walletService.GetWalletAsync(id);
             return wallet is null ? NotFound() : wallet.AsContract();
         }
 
         [HttpPost("{id}/transaction")]
-        public ActionResult<TransactionContract> RegisterTransaction(RegisterTransactionContract registerTransaction)
+        public async Task<ActionResult<TransactionContract>> RegisterTransactionAsync(RegisterTransactionContract registerTransaction)
         {
-            var result = _transactionService.RegisterTransaction(registerTransaction);
+            var result = await _transactionService.RegisterTransactionAsync(registerTransaction);
             return result is null ? NotFound() : result.AsContract();
         }
     }

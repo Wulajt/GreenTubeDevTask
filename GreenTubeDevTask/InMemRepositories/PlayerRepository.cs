@@ -1,13 +1,14 @@
 ﻿using GreenTubeDevTask.Entities;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace GreenTubeDevTask.InMemRepositories
 {
     public class PlayerRepository : RepositoryBase<Player>, IPlayerRepository, IRepositoryBase<Player>
     {
-        public Player GetByUsername(string username)
+        public async Task<Player> GetByUsernameAsync(string username)
         {
-            return GetAll().Where(player => player.Username == username).FirstOrDefault();
+            return (await GetAllAsync()).Where(player => player.Username == username).FirstOrDefault();
         }
     }
 }

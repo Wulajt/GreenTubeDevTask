@@ -2,12 +2,13 @@
 using GreenTubeDevTask.Services;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace GreenTubeDevTask.InMemRepositories
 {
     public interface ITransactionRepository : IRepositoryBase<Transaction>
     {
-        IEnumerable<Transaction> GetAllByPlayerId(Guid playerId);
-        Transaction GetTransactionByPlayerIdAndIdempotentKey(Guid playerId, Guid idempotentKey);
+        Task<IEnumerable<Transaction>> GetAllByPlayerIdAsync(Guid playerId);
+        Task<Transaction> GetTransactionByPlayerIdAndIdempotentKeyAsync(Guid playerId, Guid idempotentKey);
     }
 }

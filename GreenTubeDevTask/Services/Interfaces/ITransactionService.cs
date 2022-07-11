@@ -9,10 +9,10 @@ namespace GreenTubeDevTask.Services
 {
     public interface ITransactionService
     {
-        IEnumerable<Transaction> GetTransactions();
-        Transaction GetTransaction(Guid id);
-        IEnumerable<Transaction> GetTransactionsByPlayerId(Guid playerId);
+        Task<IEnumerable<Transaction>> GetTransactionsAsync();
+        Task<Transaction> GetTransactionAsync(Guid id);
+        Task<IEnumerable<Transaction>> GetTransactionsByPlayerIdAsync(Guid playerId);
 #nullable enable
-        Transaction? RegisterTransaction(RegisterTransactionContract contract);
+        Task<Transaction?> RegisterTransactionAsync(RegisterTransactionContract contract);
     }
 }

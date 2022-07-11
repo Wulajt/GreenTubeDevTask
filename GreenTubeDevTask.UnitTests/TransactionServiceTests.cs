@@ -9,6 +9,7 @@ using Moq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Xunit;
 using static GreenTubeDevTask.UnitTests.Helpers;
 
@@ -22,17 +23,17 @@ namespace GreenTubeDevTask.UnitTests
         private readonly Random _rand = new();
 
         [Fact]
-        public void RegisterTransaction_WithTransactionDeposit_ReturnsRegisteredTransactionAccepted()
+        public async Task RegisterTransactionAsync_WithTransactionDeposit_ReturnsRegisteredTransactionAccepted()
         {
             // Arrange
             var playerWallet = CreateRandomWallet();
             var transactionToRegister = new RegisterTransactionContract(playerWallet.Id, TransactionType.Deposit, _rand.Next(1, 1000), Guid.NewGuid());
-            _walletServiceStub.Setup(exp => exp.IncreaseWalletBalance(It.IsAny<Guid>(), It.IsAny<decimal>()))
-                .Returns(true);
+            _walletServiceStub.Setup(exp => exp.IncreaseWalletBalanceAsync(It.IsAny<Guid>(), It.IsAny<decimal>()))
+                .ReturnsAsync(true);
             var service = new TransactionService(_loggerStub.Object, _walletServiceStub.Object, _transactionRepositoryStub.Object);
 
             // Action
-            var result = service.RegisterTransaction(transactionToRegister);
+            var result = await service.RegisterTransactionAsync(transactionToRegister);
 
             // Assert
             result.Should().BeEquivalentTo(transactionToRegister);
@@ -42,33 +43,33 @@ namespace GreenTubeDevTask.UnitTests
         }
 
         [Fact]
-        public void RegisterTransaction_WithTransactionDepositWithNonExistingPlayer_ReturnsNull()
+        public async Task RegisterTransactionAsync_WithTransactionDepositWithNonExistingPlayer_ReturnsNull()
         {
             // Arrange
             var transactionToRegister = new RegisterTransactionContract(Guid.NewGuid(), TransactionType.Deposit, _rand.Next(1, 1000), Guid.NewGuid());
-            _walletServiceStub.Setup(exp => exp.IncreaseWalletBalance(It.IsAny<Guid>(), It.IsAny<decimal>()))
-                .Returns((bool?)null);
+            _walletServiceStub.Setup(exp => exp.IncreaseWalletBalanceAsync(It.IsAny<Guid>(), It.IsAny<decimal>()))
+                .ReturnsAsync((bool?)null);
             var service = new TransactionService(_loggerStub.Object, _walletServiceStub.Object, _transactionRepositoryStub.Object);
 
             // Action
-            var result = service.RegisterTransaction(transactionToRegister);
+            var result = await service.RegisterTransactionAsync(transactionToRegister);
 
             // Assert
             result.Should().Be(null);
         }
 
         [Fact]
-        public void RegisterTransaction_WithTransactionWin_ReturnsRegisteredTransactionAccepted()
+        public async Task RegisterTransactionAsync_WithTransactionWin_ReturnsRegisteredTransactionAccepted()
         {
             // Arrange
             var playerWallet = CreateRandomWallet();
             var transactionToRegister = new RegisterTransactionContract(playerWallet.Id, TransactionType.Win, _rand.Next(1, 1000), Guid.NewGuid());
-            _walletServiceStub.Setup(exp => exp.IncreaseWalletBalance(It.IsAny<Guid>(), It.IsAny<decimal>()))
-                .Returns(true);
+            _walletServiceStub.Setup(exp => exp.IncreaseWalletBalanceAsync(It.IsAny<Guid>(), It.IsAny<decimal>()))
+                .ReturnsAsync(true);
             var service = new TransactionService(_loggerStub.Object, _walletServiceStub.Object, _transactionRepositoryStub.Object);
 
             // Action
-            var result = service.RegisterTransaction(transactionToRegister);
+            var result = await service.RegisterTransactionAsync(transactionToRegister);
 
             // Assert
             result.Should().BeEquivalentTo(transactionToRegister);
@@ -78,33 +79,33 @@ namespace GreenTubeDevTask.UnitTests
         }
 
         [Fact]
-        public void RegisterTransaction_WithTransactionWinWithNonExistingPlayer_ReturnsNull()
+        public async Task RegisterTransactionAsync_WithTransactionWinWithNonExistingPlayer_ReturnsNull()
         {
             // Arrange
             var transactionToRegister = new RegisterTransactionContract(Guid.NewGuid(), TransactionType.Win, _rand.Next(1, 1000), Guid.NewGuid());
-            _walletServiceStub.Setup(exp => exp.IncreaseWalletBalance(It.IsAny<Guid>(), It.IsAny<decimal>()))
-                .Returns((bool?)null);
+            _walletServiceStub.Setup(exp => exp.IncreaseWalletBalanceAsync(It.IsAny<Guid>(), It.IsAny<decimal>()))
+                .ReturnsAsync((bool?)null);
             var service = new TransactionService(_loggerStub.Object, _walletServiceStub.Object, _transactionRepositoryStub.Object);
 
             // Action
-            var result = service.RegisterTransaction(transactionToRegister);
+            var result = await service.RegisterTransactionAsync(transactionToRegister);
 
             // Assert
             result.Should().Be(null);
         }
 
         [Fact]
-        public void RegisterTransaction_WithTransactionStake_ReturnsRegisteredTransactionAccepted()
+        public async Task RegisterTransactionAsync_WithTransactionStake_ReturnsRegisteredTransactionAccepted()
         {
             // Arrange
             var playerWallet = CreateRandomWallet();
             var transactionToRegister = new RegisterTransactionContract(playerWallet.Id, TransactionType.Stake, _rand.Next(1, 1000), Guid.NewGuid());
-            _walletServiceStub.Setup(exp => exp.DecreaseWalletBalance(It.IsAny<Guid>(), It.IsAny<decimal>()))
-                .Returns(true);
+            _walletServiceStub.Setup(exp => exp.DecreaseWalletBalanceAsync(It.IsAny<Guid>(), It.IsAny<decimal>()))
+                .ReturnsAsync(true);
             var service = new TransactionService(_loggerStub.Object, _walletServiceStub.Object, _transactionRepositoryStub.Object);
 
             // Action
-            var result = service.RegisterTransaction(transactionToRegister);
+            var result = await service.RegisterTransactionAsync(transactionToRegister);
 
             // Assert
             result.Should().BeEquivalentTo(transactionToRegister);
@@ -114,32 +115,32 @@ namespace GreenTubeDevTask.UnitTests
         }
 
         [Fact]
-        public void RegisterTransaction_WithTransactionStakeWithNonExistingPlayer_ReturnsNull()
+        public async Task RegisterTransactionAsync_WithTransactionStakeWithNonExistingPlayer_ReturnsNull()
         {
             // Arrange
             var transactionToRegister = new RegisterTransactionContract(Guid.NewGuid(), TransactionType.Stake, _rand.Next(1, 1000), Guid.NewGuid());
-            _walletServiceStub.Setup(exp => exp.DecreaseWalletBalance(It.IsAny<Guid>(), It.IsAny<decimal>()))
-                .Returns((bool?)null);
+            _walletServiceStub.Setup(exp => exp.DecreaseWalletBalanceAsync(It.IsAny<Guid>(), It.IsAny<decimal>()))
+                .ReturnsAsync((bool?)null);
             var service = new TransactionService(_loggerStub.Object, _walletServiceStub.Object, _transactionRepositoryStub.Object);
 
             // Action
-            var result = service.RegisterTransaction(transactionToRegister);
+            var result = await service.RegisterTransactionAsync(transactionToRegister);
 
             // Assert
             result.Should().Be(null);
         }
 
         [Fact]
-        public void RegisterTransaction_WithTransactionStakeWithAmountGreaterThanBalance_ReturnsTransactionRejected()
+        public async Task RegisterTransactionAsync_WithTransactionStakeWithAmountGreaterThanBalance_ReturnsTransactionRejected()
         {
             // Arrange
             var transactionToRegister = new RegisterTransactionContract(Guid.NewGuid(), TransactionType.Stake, _rand.Next(1, 1000), Guid.NewGuid());
-            _walletServiceStub.Setup(exp => exp.DecreaseWalletBalance(It.IsAny<Guid>(), It.IsAny<decimal>()))
-                .Returns(false);
+            _walletServiceStub.Setup(exp => exp.DecreaseWalletBalanceAsync(It.IsAny<Guid>(), It.IsAny<decimal>()))
+                .ReturnsAsync(false);
             var service = new TransactionService(_loggerStub.Object, _walletServiceStub.Object, _transactionRepositoryStub.Object);
 
             // Action
-            var result = service.RegisterTransaction(transactionToRegister);
+            var result = await service.RegisterTransactionAsync(transactionToRegister);
 
             // Assert
             result.Should().BeEquivalentTo(transactionToRegister);
@@ -149,25 +150,25 @@ namespace GreenTubeDevTask.UnitTests
         }
 
         [Fact]
-        public void RegisterTransaction_WithDepositMultipleSameRequests_ReturnsAcceptedIdempotentBehavior()
+        public async Task RegisterTransactionAsync_WithDepositMultipleSameRequests_ReturnsAcceptedIdempotentBehavior()
         {
             // Arrange
             decimal amountToDeposit = _rand.Next(1, 1000);
             var transactionToRegister = new RegisterTransactionContract(Guid.NewGuid(), TransactionType.Deposit, amountToDeposit, Guid.NewGuid());
 
             var numberOfCalls = _rand.Next(5, 15);
-            _walletServiceStub.Setup(exp => exp.IncreaseWalletBalance(It.IsAny<Guid>(), It.IsAny<decimal>()))
-                .Returns(true);
+            _walletServiceStub.Setup(exp => exp.IncreaseWalletBalanceAsync(It.IsAny<Guid>(), It.IsAny<decimal>()))
+                .ReturnsAsync(true);
             var service = new TransactionService(_loggerStub.Object, _walletServiceStub.Object, _transactionRepositoryStub.Object);
-            var firstResult = service.RegisterTransaction(transactionToRegister);
-            _transactionRepositoryStub.Setup(exp => exp.GetTransactionByPlayerIdAndIdempotentKey(It.IsAny<Guid>(), It.IsAny<Guid>()))
-                .Returns(firstResult);
+            var firstResult = await service.RegisterTransactionAsync(transactionToRegister);
+            _transactionRepositoryStub.Setup(exp => exp.GetTransactionByPlayerIdAndIdempotentKeyAsync(It.IsAny<Guid>(), It.IsAny<Guid>()))
+                .ReturnsAsync(firstResult);
 
             // Action
             var results = new List<Transaction?>();
             for (int i = 0; i<numberOfCalls-1; i++)
             {
-                results.Add(service.RegisterTransaction(transactionToRegister));
+                results.Add(await service.RegisterTransactionAsync(transactionToRegister));
             }
 
             // Assert
