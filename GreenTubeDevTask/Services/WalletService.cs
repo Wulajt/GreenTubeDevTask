@@ -3,6 +3,7 @@ using GreenTubeDevTask.InMemRepositories;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace GreenTubeDevTask.Services
@@ -41,7 +42,9 @@ namespace GreenTubeDevTask.Services
         {
             var wallet = await GetWalletAsync(id);
             if (wallet is null) return null;
+            mutexLock.WaitOne();
             wallet.Balance = decimal.Add(wallet.Balance, amount);
+            mutexLock.ReleaseMutex();
             return true;
         }
 
@@ -49,14 +52,23 @@ namespace GreenTubeDevTask.Services
         {
             var wallet = await GetWalletAsync(id);
             if (wallet is null) return null;
-            if (wallet.Balance < amount) return false;
-            wallet.Balance = decimal.Subtract(wallet.Balance, amount);
-            return true;
+            //bool result = false;
+            mutexLock.WaitOne();
+            bool result = false;
+            decimal updatedBalance = decimal.Subtract(wallet.Balance, amount);
+            if (updatedBalance >= decimal.Zero)
+            {
+                wallet.Balance = updatedBalance;
+                result = true;
+            }
+            mutexLock.ReleaseMutex();
+            return result;
         }
 #nullable disable
 
         // Private, Internal, Protected
         private readonly ILogger<WalletService> _logger;
         private readonly IWalletRepository _repository;
+        private static Mutex mutexLock = new Mutex(false);
     }
 }

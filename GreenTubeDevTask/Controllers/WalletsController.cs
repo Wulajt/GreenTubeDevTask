@@ -38,11 +38,18 @@ namespace GreenTubeDevTask.Controllers
             return wallet is null ? NotFound() : wallet.AsContract();
         }
 
-        [HttpPost("{id}/transaction")]
+        [HttpPost("{id}/transaction/register")]
         public async Task<ActionResult<TransactionContract>> RegisterTransactionAsync(RegisterTransactionContract registerTransaction)
         {
             var result = await _transactionService.RegisterTransactionAsync(registerTransaction);
             return result is null ? NotFound() : result.AsContract();
+        }
+
+        [HttpGet("{id}/transactions")]
+        public async Task<ActionResult<IEnumerable<TransactionContract>>> GetWalletTransactionsAsync(Guid id)
+        {
+            var result = await _transactionService.GetTransactionsByPlayerIdAsync(id);
+            return result is null ? NotFound() : Ok(result.Select(x => x.AsContract()));
         }
     }
 }

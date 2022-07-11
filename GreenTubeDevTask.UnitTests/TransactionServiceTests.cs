@@ -165,11 +165,12 @@ namespace GreenTubeDevTask.UnitTests
                 .ReturnsAsync(firstResult);
 
             // Action
-            var results = new List<Transaction?>();
+            var results = new List<Task<Transaction?>>();
             for (int i = 0; i<numberOfCalls-1; i++)
             {
-                results.Add(await service.RegisterTransactionAsync(transactionToRegister));
+                results.Add(service.RegisterTransactionAsync(transactionToRegister));
             }
+            Task.WaitAll(results.ToArray());
 
             // Assert
             firstResult.Should().BeEquivalentTo(transactionToRegister);
@@ -178,7 +179,7 @@ namespace GreenTubeDevTask.UnitTests
             firstResult.Status.Should().Be(TransactionStatus.Accepted);
             foreach (var result in results)
             {
-                result.Should().BeEquivalentTo(firstResult);
+                result.Result.Should().BeEquivalentTo(firstResult);
             }
         }
     }
