@@ -52,7 +52,6 @@ namespace GreenTubeDevTask.Services
         {
             var wallet = await GetWalletAsync(id);
             if (wallet is null) return null;
-            //bool result = false;
             mutexLock.WaitOne();
             bool result = false;
             decimal updatedBalance = decimal.Subtract(wallet.Balance, amount);
@@ -69,6 +68,6 @@ namespace GreenTubeDevTask.Services
         // Private, Internal, Protected
         private readonly ILogger<WalletService> _logger;
         private readonly IWalletRepository _repository;
-        private static Mutex mutexLock = new Mutex(false);
+        private readonly static Mutex mutexLock = new Mutex(false);
     }
 }

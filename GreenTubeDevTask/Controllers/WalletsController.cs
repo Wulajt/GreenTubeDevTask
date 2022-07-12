@@ -38,7 +38,7 @@ namespace GreenTubeDevTask.Controllers
             return wallet is null ? NotFound() : wallet.AsContract();
         }
 
-        [HttpPost("{id}/transaction/register")]
+        [HttpPost("transactions/register")]
         public async Task<ActionResult<TransactionContract>> RegisterTransactionAsync(RegisterTransactionContract registerTransaction)
         {
             var result = await _transactionService.RegisterTransactionAsync(registerTransaction);

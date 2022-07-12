@@ -32,8 +32,7 @@ namespace GreenTubeDevTask.Controllers
         public async Task<ActionResult<PlayerContract>> GetPlayerAsync(Guid id)
         {
             var player = await _playerService.GetPlayerAsync(id);
-            if (player is null) return NotFound();
-            return player.AsContract();
+            return player is null ? NotFound() : player.AsContract();
         }
 
         [HttpPost("register")]

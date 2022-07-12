@@ -166,10 +166,11 @@ namespace GreenTubeDevTask.UnitTests
 
             // Action
             var results = new List<Task<Transaction?>>();
-            for (int i = 0; i<numberOfCalls-1; i++)
-            {
-                results.Add(service.RegisterTransactionAsync(transactionToRegister));
-            }
+            Parallel.For(0, numberOfCalls,
+                index =>
+                {
+                    results.Add(service.RegisterTransactionAsync(transactionToRegister));
+                });
             Task.WaitAll(results.ToArray());
 
             // Assert

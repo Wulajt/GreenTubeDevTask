@@ -59,9 +59,5 @@ namespace GreenTubeDevTask.Services
         private readonly ILogger<PlayerService> _logger;
         private readonly IPlayerRepository _repository;
         private readonly IWalletService _walletService;
-        async Task<Player> IPlayerService.GetPlayerByUsernameAsync(string username)
-        {
-            return await _repository.GetByUsernameAsync(username);
-        }
     }
 }

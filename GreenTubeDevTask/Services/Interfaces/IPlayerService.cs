@@ -10,7 +10,6 @@ namespace GreenTubeDevTask.Services
     {
         Task<IEnumerable<Player>> GetPlayersAync();
         Task<Player> GetPlayerAsync(Guid id);
-        Task<Player> GetPlayerByUsernameAsync(string username);
 #nullable enable
         Task<Player?> CreatePlayerAsync(PlayerRegisterContract player);
     }

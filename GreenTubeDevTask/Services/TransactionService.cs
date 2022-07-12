@@ -38,8 +38,8 @@ namespace GreenTubeDevTask.Services
         {
             mutexLock.WaitOne();
             Transaction? result = null;
-            var transactionExists = await _repository.GetTransactionByPlayerIdAndIdempotentKeyAsync(contract.PlayerId, contract.IdempotentKey);
-            if (transactionExists is null)
+            result = await _repository.GetTransactionByPlayerIdAndIdempotentKeyAsync(contract.PlayerId, contract.IdempotentKey);
+            if (result is null)
             {
                 bool? updateResult;
                 switch (contract.Type)
@@ -73,8 +73,6 @@ namespace GreenTubeDevTask.Services
                 else
                     result = null;
             }
-            else
-                result = transactionExists;
             mutexLock.ReleaseMutex();
             return await Task.FromResult(result);
         }
@@ -96,6 +94,6 @@ namespace GreenTubeDevTask.Services
         private readonly ILogger<TransactionService> _logger;
         private readonly ITransactionRepository _repository;
         private readonly IWalletService _walletService;
-        private static Mutex mutexLock = new Mutex(false);
+        private readonly static Mutex mutexLock = new Mutex(false);
     }
 }

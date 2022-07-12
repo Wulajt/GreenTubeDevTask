@@ -31,5 +31,23 @@ namespace GreenTubeDevTask.UnitTests
                 DateCreated = DateTime.Now
             };
         }
+
+        public static Transaction CreateRandomTransaction(decimal amount, TransactionType type, TransactionStatus status)
+        {
+            return new()
+            {
+                Id = Guid.NewGuid(),
+                PlayerId = Guid.NewGuid(),
+                Amount = amount,
+                DateCreated = DateTime.Now,
+                IdempotentKey = Guid.NewGuid(),
+                Status = status,
+                Type = type
+            };
+        }
+        public static Transaction CreateRandomTransaction()
+        {
+            return CreateRandomTransaction(_rand.Next(1000, 10000), TransactionType.Deposit, TransactionStatus.Accepted);
+        }
     }
 }
